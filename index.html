@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Menu du restaurant avec des plats délicieux, sandwichs, boissons et desserts" />
+    <title>Le Menu du Restaurant</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Unregister any existing service workers first
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('ServiceWorker unregistered');
+          }
+
+          // Clear caches
+          caches.keys().then(function(names) {
+            for (let name of names) {
+              caches.delete(name);
+              console.log('Cache deleted:', name);
+            }
+          });
+
+          // Register new service worker
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(error => {
+              console.log('ServiceWorker registration failed: ', error);
+            });
+        });
+      }
+
+      // Clear localStorage when user leaves the page
+      window.addEventListener('beforeunload', () => {
+        // Clear all localStorage items
+        localStorage.clear();
+        // Clear all sessionStorage items
+        sessionStorage.clear();
+        console.log('All storage cleared on page unload');
+      });
+    </script>
+  </body>
+</html>
