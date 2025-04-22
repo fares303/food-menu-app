@@ -224,8 +224,19 @@ export const organizeMenuItemsByCategory = (menuItems, categories) => {
 
   // Populate categories with menu items
   menuItems.forEach(item => {
+    // Convert snake_case to camelCase for frontend
+    const convertedItem = {
+      ...item,
+      // Convert snake_case to camelCase
+      isPopular: item.is_popular,
+      isSpecial: item.is_special,
+      // Keep the original fields for compatibility
+      is_popular: item.is_popular,
+      is_special: item.is_special
+    };
+
     if (organizedData[item.category_id]) {
-      organizedData[item.category_id].push(item);
+      organizedData[item.category_id].push(convertedItem);
     }
   });
 

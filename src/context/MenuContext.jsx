@@ -183,14 +183,23 @@ export const MenuProvider = ({ children }) => {
       console.log('Adding new item to category:', categoryId, newItem);
 
       // Create a lightweight version of the image URL to prevent loading issues
+      // Convert camelCase to snake_case for Supabase
       const optimizedItem = {
         ...newItem,
         category_id: categoryId,
+        // Convert isPopular to is_popular for Supabase
+        is_popular: newItem.isPopular,
+        is_special: newItem.isSpecial,
+        // Remove camelCase properties that don't match the database schema
+        isPopular: undefined,
+        isSpecial: undefined,
         // Add a cache-busting parameter to the image URL
         image: newItem.image.includes('?')
           ? `${newItem.image}&v=${Date.now()}`
           : `${newItem.image}?v=${Date.now()}`
       };
+
+      console.log('Optimized item for Supabase:', optimizedItem);
 
       if (isOnline) {
         // Add to Supabase
@@ -227,14 +236,23 @@ export const MenuProvider = ({ children }) => {
       console.log('Updating item in category:', categoryId, updatedItem);
 
       // Create a lightweight version of the image URL to prevent loading issues
+      // Convert camelCase to snake_case for Supabase
       const optimizedItem = {
         ...updatedItem,
         category_id: categoryId,
+        // Convert isPopular to is_popular for Supabase
+        is_popular: updatedItem.isPopular,
+        is_special: updatedItem.isSpecial,
+        // Remove camelCase properties that don't match the database schema
+        isPopular: undefined,
+        isSpecial: undefined,
         // Add a cache-busting parameter to the image URL if it's a new URL
         image: updatedItem.image.includes('?')
           ? updatedItem.image
           : `${updatedItem.image}?v=${Date.now()}`
       };
+
+      console.log('Optimized item for Supabase update:', optimizedItem);
 
       if (isOnline) {
         // Update in Supabase
