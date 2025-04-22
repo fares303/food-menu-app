@@ -4,4 +4,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Debug environment variables
+console.log('Supabase URL defined:', !!supabaseUrl)
+console.log('Supabase Anon Key defined:', !!supabaseAnonKey)
+
+// Fallback to default values if environment variables are not set
+const finalSupabaseUrl = supabaseUrl || 'https://your-project-url.supabase.co'
+const finalSupabaseAnonKey = supabaseAnonKey || 'public-anon-key'
+
+export const supabase = createClient(finalSupabaseUrl, finalSupabaseAnonKey)

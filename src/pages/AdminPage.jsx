@@ -68,15 +68,33 @@ const AdminPage = () => {
     setEditingItem({ ...item });
   };
 
-  const handleSaveItem = () => {
+  const handleSaveItem = async (e) => {
+    // Prevent default form submission behavior
+    if (e && e.preventDefault) e.preventDefault();
+
     if (!editingItem) return;
 
-    const success = updateMenuItem(selectedCategory, editingItem);
-    if (success) {
-      setSuccessMessage('Produit modifié avec succès!');
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-      setEditingItem(null);
+    if (!editingItem.name || !editingItem.price) {
+      alert('Veuillez remplir tous les champs obligatoires (nom et prix)');
+      return;
+    }
+
+    try {
+      console.log('Updating item:', editingItem);
+      const success = await updateMenuItem(selectedCategory, editingItem);
+
+      if (success) {
+        setSuccessMessage('Produit modifié avec succès!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        setEditingItem(null);
+      } else {
+        console.error('Failed to update item');
+        alert('Erreur lors de la modification du produit. Veuillez vérifier la console pour plus de détails.');
+      }
+    } catch (error) {
+      console.error('Error updating item:', error);
+      alert(`Erreur lors de la modification du produit: ${error.message}`);
     }
   };
 
@@ -137,26 +155,52 @@ const AdminPage = () => {
     setEditingItem(null);
   };
 
-  const handleSaveNewItem = () => {
-    if (!newItem || !newItem.name || !newItem.price) return;
+  const handleSaveNewItem = async (e) => {
+    // Prevent default form submission behavior
+    if (e && e.preventDefault) e.preventDefault();
 
-    const success = addMenuItem(selectedCategory, newItem);
-    if (success) {
-      setSuccessMessage('Produit ajouté avec succès!');
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-      setNewItem(null);
+    if (!newItem || !newItem.name || !newItem.price) {
+      alert('Veuillez remplir tous les champs obligatoires (nom et prix)');
+      return;
+    }
+
+    try {
+      console.log('Adding new item:', newItem);
+      const success = await addMenuItem(selectedCategory, newItem);
+
+      if (success) {
+        setSuccessMessage('Produit ajouté avec succès!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        setNewItem(null);
+      } else {
+        console.error('Failed to add item');
+        alert('Erreur lors de l\'ajout du produit. Veuillez vérifier la console pour plus de détails.');
+      }
+    } catch (error) {
+      console.error('Error adding item:', error);
+      alert(`Erreur lors de l\'ajout du produit: ${error.message}`);
     }
   };
 
-  const handleDeleteItem = (itemId) => {
+  const handleDeleteItem = async (itemId) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) return;
 
-    const success = deleteMenuItem(selectedCategory, itemId);
-    if (success) {
-      setSuccessMessage('Produit supprimé avec succès!');
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+    try {
+      console.log('Deleting item:', itemId);
+      const success = await deleteMenuItem(selectedCategory, itemId);
+
+      if (success) {
+        setSuccessMessage('Produit supprimé avec succès!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else {
+        console.error('Failed to delete item');
+        alert('Erreur lors de la suppression du produit. Veuillez vérifier la console pour plus de détails.');
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert(`Erreur lors de la suppression du produit: ${error.message}`);
     }
   };
 
@@ -174,24 +218,36 @@ const AdminPage = () => {
     setIsAddingCategory(true);
   };
 
-  const handleSaveCategory = () => {
-    if (!newCategory.id || !newCategory.name) return;
+  const handleSaveCategory = async (e) => {
+    // Prevent default form submission behavior
+    if (e && e.preventDefault) e.preventDefault();
 
-    const success = addCategory(newCategory);
-
-    if (!success) {
-      alert('Une catégorie avec cet identifiant existe déjà.');
+    if (!newCategory.id || !newCategory.name) {
+      alert('Veuillez remplir tous les champs obligatoires (nom et identifiant)');
       return;
     }
 
-    setSuccessMessage('Catégorie ajoutée avec succès!');
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
-    setIsAddingCategory(false);
-    setNewCategory({ id: '', name: '', order: 0 });
+    try {
+      console.log('Adding new category:', newCategory);
+      const success = await addCategory(newCategory);
+
+      if (!success) {
+        alert('Une catégorie avec cet identifiant existe déjà.');
+        return;
+      }
+
+      setSuccessMessage('Catégorie ajoutée avec succès!');
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      setIsAddingCategory(false);
+      setNewCategory({ id: '', name: '', order: 0 });
+    } catch (error) {
+      console.error('Error adding category:', error);
+      alert(`Erreur lors de l\'ajout de la catégorie: ${error.message}`);
+    }
   };
 
-  const handleDeleteCategory = (categoryId) => {
+  const handleDeleteCategory = async (categoryId) => {
     if (categoryId === 'plats' || categoryId === 'sandwichs' || categoryId === 'boissons' || categoryId === 'desserts') {
       alert('Impossible de supprimer une catégorie par défaut.');
       return;
@@ -199,17 +255,26 @@ const AdminPage = () => {
 
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie et tous ses éléments ?')) return;
 
-    const success = deleteCategory(categoryId);
+    try {
+      console.log('Deleting category:', categoryId);
+      const success = await deleteCategory(categoryId);
 
-    if (success) {
-      setSuccessMessage('Catégorie supprimée avec succès!');
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      if (success) {
+        setSuccessMessage('Catégorie supprimée avec succès!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
 
-      // If the deleted category was selected, switch to 'plats'
-      if (selectedCategory === categoryId) {
-        setSelectedCategory('plats');
+        // If the deleted category was selected, switch to 'plats'
+        if (selectedCategory === categoryId) {
+          setSelectedCategory('plats');
+        }
+      } else {
+        console.error('Failed to delete category');
+        alert('Erreur lors de la suppression de la catégorie. Veuillez vérifier la console pour plus de détails.');
       }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      alert(`Erreur lors de la suppression de la catégorie: ${error.message}`);
     }
   };
 
@@ -813,6 +878,7 @@ const AdminPage = () => {
                       Annuler
                     </button>
                     <button
+                      type="button"
                       onClick={handleSaveNewItem}
                       style={{
                         backgroundColor: '#d4af37',
@@ -970,6 +1036,7 @@ const AdminPage = () => {
                       Annuler
                     </button>
                     <button
+                      type="button"
                       onClick={handleSaveCategory}
                       style={{
                         backgroundColor: '#d4af37',
@@ -1159,6 +1226,7 @@ const AdminPage = () => {
                   Annuler
                 </button>
                 <button
+                  type="button"
                   onClick={handleSaveItem}
                   style={{
                     backgroundColor: '#d4af37',
